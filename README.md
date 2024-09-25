@@ -35,12 +35,6 @@ Tacotron 모델 등의 TTS 모델을 활용하여 챗봇에서 생
 - 2주차 미비점 및 미완성 부분 보완
 - 음성 녹음 및 음성 모델 합성
 - 웹 페이지 구현 시작
-- ![image](https://github.com/user-attachments/assets/9c99e041-ff90-4d07-b5f7-a309ee2c4349)
-- ![image](https://github.com/user-attachments/assets/8ec02147-d48d-4829-aba8-f034f6e49c73)
-- ![image](https://github.com/user-attachments/assets/0c79ba29-8b1f-47da-8c1a-a4a0aa7634f6)
-- ![image](https://github.com/user-attachments/assets/c4b8b050-313a-45ef-8b28-eeea82e7a71e)
-
-
 5주차(5월 30일 ~ 6월 2일)
 - PPT 발표 준비 및 시연 준비
 - 웹 페이지 구현 마무리
@@ -49,4 +43,8 @@ AWS for service 49.43 USD/month
 - cpu 4cores, 8 GB ram storage
 
 - 완성본
-  ![image](https://github.com/user-attachments/assets/293bc820-a229-4359-8c7b-8e75732c37ed)
+-  ![image](https://github.com/user-attachments/assets/9c99e041-ff90-4d07-b5f7-a309ee2c4349)
+- ![image](https://github.com/user-attachments/assets/8ec02147-d48d-4829-aba8-f034f6e49c73)
+- ![image](https://github.com/user-attachments/assets/0c79ba29-8b1f-47da-8c1a-a4a0aa7634f6)
+- ![image](https://github.com/user-attachments/assets/c4b8b050-313a-45ef-8b28-eeea82e7a71e)
+  
