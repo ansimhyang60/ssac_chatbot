@@ -1,0 +1,620 @@
+<!DOCTYPE html manifest="cache.manifest">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>감성있는 AI DJ와 음악 나누기</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/favicon.ico') }}">
+    <style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #edeff2;
+  font-family: "Calibri", "Roboto", sans-serif;
+}
+
+.chat_window {
+  position: absolute;
+  width: calc(100% - 20px);
+  max-width: 800px;
+  height: 700px;
+  border-radius: 10px;
+  background-color: #fff;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  background-color: #f8f8f8;
+  overflow: hidden;
+}
+
+.top_menu {
+  background-color: #fff;
+  width: 100%;
+  padding: 20px 0 15px;
+  box-shadow: 0 1px 30px rgba(0, 0, 0, 0.1);
+}
+.top_menu .buttons {
+  margin: 3px 0 0 20px;
+  position: absolute;
+}
+.top_menu .buttons .button {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+  position: relative;
+}
+.top_menu .buttons .button.close {
+  background-color: #f5886e;
+}
+.top_menu .buttons .button.minimize {
+  background-color: #fdbf68;
+}
+.top_menu .buttons .button.maximize {
+  background-color: #a3d063;
+}
+
+.top_menu .title {
+  margin-bottom: 6px;
+  text-align: center;
+    color: #bcbdc0;
+    font-size: 20px;
+}
+  
+
+.messages {
+  position: relative;
+  list-style: none;
+  padding: 20px 10px 0 10px;
+  margin: 0;
+  height: 510px;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.messages::-webkit-scrollbar{
+  display:none;
+}
+.messages .message {
+  clear: both;
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: all 0.5s linear;
+  opacity: 0;
+}
+.messages .message.left .avatar {
+  background-color: #f5886e;
+  vertical-align: middle;
+  background-image: url({{ url_for('static', path='/img_avatar2-female60.png') }}); 
+  float: left;
+}
+.messages .message.left .text_wrapper {
+  background-color: #ffe6cb;
+  margin-left: 20px;
+}
+.messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
+  right: 100%;
+  border-right-color: #ffe6cb;
+}
+.messages .message.left .text {
+  color: #c48843;
+}
+.messages .message.left2 .avatar {
+  background-color: #f5886e;
+  vertical-align: middle;
+  background-image: url({{ url_for('static', path='/img_avatar1-male60.png') }}); 
+  float: left;
+}
+.messages .message.left2 .text_wrapper {
+  background-color: #ffe6cb;
+  margin-left: 20px;
+}
+.messages .message.left2 .text_wrapper::after, .messages .message.left2 .text_wrapper::before {
+  right: 100%;
+  border-right-color: #ffe6cb;
+}
+.messages .message.left2 .text {
+  color: #c48843;
+}
+.messages .message.right .avatar {
+  background-color: #fdbf68;
+  float: right;
+}
+.messages .message.right .text_wrapper {
+  background-color: #c7eafc;
+  margin-right: 20px;
+  float: right;
+}
+.messages .message.right .text_wrapper::after, .messages .message.right .text_wrapper::before {
+  left: 100%;
+  border-left-color: #c7eafc;
+}
+.messages .message.right .text {
+  color: #45829b;
+}
+.messages .message.appeared {
+  opacity: 1;
+}
+.messages .message .avatar {
+  vertical-align: middle;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.messages .message .text_wrapper {
+  display: inline-block;
+  padding: 20px;
+  border-radius: 6px;
+  width: calc(100% - 85px);
+  min-width: 100px;
+  position: relative;
+}
+.messages .message .text_wrapper::after, .messages .message .text_wrapper:before {
+  top: 18px;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.messages .message .text_wrapper::after {
+  border-width: 13px;
+  margin-top: 0px;
+}
+.messages .message .text_wrapper::before {
+  border-width: 15px;
+  margin-top: -2px;
+}
+.messages .message .text_wrapper .text {
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.bottom_wrapper {
+  position: relative;
+  width: 100%;
+  background-color: #fff;
+  padding: 20px 20px;
+  position: absolute;
+  bottom: 0;
+}
+.bottom_wrapper .message_input_wrapper {
+  display: inline-block;
+  height: 50px;
+  border-radius: 25px;
+  border: 1px solid #bcbdc0;
+  width: calc(100% - 160px);
+  position: relative;
+  padding: 0 20px;
+}
+.bottom_wrapper .message_input_wrapper .message_input {
+  border: none;
+  height: 100%;
+  box-sizing: border-box;
+  width: calc(100% - 40px);
+  position: absolute;
+  outline-width: 0;
+  color: gray;
+}
+.bottom_wrapper .send_message {
+  width: 140px;
+  height: 50px;
+  display: inline-block;
+  border-radius: 50px;
+  background-color: #a3d063;
+  border: 2px solid #a3d063;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  text-align: center;
+  float: right;
+}
+.bottom_wrapper .send_message:hover {
+  color: #a3d063;
+  background-color: #fff;
+}
+.bottom_wrapper .send_message .text {
+  font-size: 18px;
+  font-weight: 300;
+  display: inline-block;
+  line-height: 48px;
+}
+
+.message_template {
+  display: none;
+}
+audio::-webkit-media-controls-play-button,
+     audio::-webkit-media-controls-panel {
+     background-color: #FFFFFF;
+     opacity: 0.85;
+     color: #000;
+     }
+audio { width: 460px; }
+       
+    </style>
+</head>
+<body>
+<!------ Include the above in your HEAD tag ---------->
+<div class="chat_window">
+  <div class="top_menu">
+    <div class="buttons">
+      <div class="button close"></div>
+      <div class="button minimize"></div>
+      <div class="button maximize"></div>
+    </div>
+    <div class="title" id="audiocontrol">
+      <audio class="audioo" controls="controls"></audio>
+      <br/>
+      <select id="audio" onchange="play_click(this)">
+        <option value='https://ssacteam2.s3.us-west-1.amazonaws.com/etc/OSTver-Volume_Up.mp3'>OSTver-Volume_Up</option>
+
+    </select>
+    <button id='prev'>Prev</button>
+    <button id='play'>Play</button>
+    <button id='stop'>Stop</button>
+    <button id='next'>Next</button>
+    <button id='mysong'>Reset Music</button>
+  </div>
+  <ul class="messages"></ul>
+  <div class="bottom_wrapper clearfix">
+    <div class="message_input_wrapper">
+      <input class="message_input" placeholder="Type your message here..." /></div>
+      <div class="send_message">
+        <div class="icon"></div>
+        <div class="text">Send</div>
+      </div>
+    </div>
+  </div>
+  <div class="message_template">
+    <li class="message">
+      <div class="avatar"></div>
+      <div class="text_wrapper">
+        <div class="text"></div>
+      </div>
+    </li>
+  </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js" integrity="sha512-ju6u+4bPX50JQmgU97YOGAXmRMrD9as4LE05PdC3qycsGQmjGlfm041azyB1VfCXpkpt1i9gqXCT6XuxhBJtKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!--<script src="../../js/vendor/popper.min.js"></script>-->
+    <!--<script src="bootstrap.min.js"></script>-->
+
+
+    <script>
+      let audio = document.querySelector('.audioo');
+      //alert(audio);
+      let play = document.getElementById('play');
+      let next = document.getElementById('next');
+      let stop = document.getElementById('stop');
+      let prev = document.getElementById('prev');
+      let select = document.getElementById('audio');
+      let mysong = document.getElementById('mysong');
+      
+      //alert(select);
+      //let name = document.getElementById('name');
+  
+      let num = 0;
+      let now_and ="";
+      let message_side = "";
+      let userselectedtitle = "";
+      let src = ["Stars_in_the_Night_Sky_(2020)"]; //곡 이름 순서대로 저장
+  
+      play.addEventListener('click', play_click); //play 버튼 클릭시 실행
+      next.addEventListener('click', next_click); //next 버튼 클릭시 실행
+      audio.addEventListener('ended', next_click);  //곡이 끝날때 실행
+      stop.addEventListener('click', stop_click); //Stop 버튼 클릭시 정지
+      prev.addEventListener('click', prev_click); //previous 버튼 클릭시 이전곡 실행
+      mysong.addEventListener('click', mysong_click); //Reset Music
+
+      function mysong_click() {
+        select.options.length = 0;
+        $(select).append("<option>감성대화 한번 더 하시고 추천곡 받아보세요 </option>");
+        num = 0;
+      }
+      
+      function play_click() {
+          audio.pause();                      //기존 진행 된 곡 정지
+          if (select.options[select.selectedIndex].value.substr(0,5) == "https") {
+              if (select.options[select.selectedIndex] == undefined)    //선택을 하지 않았을때의 play 경우
+              {
+                  audio.play();                   //기존 처음 음악 실행
+                  //name.innerHTML = src[0] + '재생중'         //실행 파일 출력
+              } else {                          //새로운 곡 선택 후 play 경우
+                  audio.src = select.options[(select.selectedIndex) % (num+1)].value; //해당 값을 src에 변경
+                  //alert((select.selectedIndex) % 5);
+                  audio.play();                       //해당 곡 실행
+                  //name.innerHTML = select.options[(select.selectedIndex) % 5].value + '재생중' // 실행 파일 출력
+              }
+          } else {
+            alert("죄송하지만 원하시는 곡을 선택해주세요.");
+          }
+      }
+  
+      function next_click() {
+          var src = document.getElementById('audio');
+          //alert(select.options[select.selectedIndex]);
+          if (select.options[select.selectedIndex] == undefined)  // 선택을 하지않고 눌렀다면 오류 언급
+              alert('원하는 곡을 선택 후 클릭하세요')
+          else {                                    //선택을 하고 눌렀다면 해당 선택한 것의 다음 노래를 가져와서 play한다.
+            var index1 =  (select.selectedIndex + 1) % (num+1)
+            //alert(index1);
+            //alert(select.options[index1].value);
+            //alert(num); 
+            //audio.src = select.options[index1].value;
+            if (num == 0) {
+                return;
+            } else {
+                audio.src = select.options[index1].value;
+            }
+            //alert(num);
+            $("#audio option:eq("+ index1 + ")").prop("selected",true);
+              audio.play();
+              //name.innerHTML = select.options[(select.selectedIndex + 1) % 5].value + '재생중'
+              //name.innerHTML = select.options[(select.selectedIndex + 1) % 5];
+          }
+      }
+      $("#next").click(function() {
+          //$('#audio option:selected').next().attr('selected', 'selected');
+      });
+    
+  
+
+  
+      function stop_click(){
+          audio.pause();
+          audio.currentTime = 0;
+      }
+  
+      function prev_click(){
+          if (select.options[select.selectedIndex] == undefined)  // 선택을 하지않고 눌렀다면 오류 언급
+              alert('원하는 곡을 선택 후 클릭하세요')
+          else {                                    //선택을 하고 눌렀다면 해당 선택한 것의 다음 노래를 가져와서 play한다.
+            //alert((select.selectedIndex - 1) % 5);
+            var index1 =  (select.selectedIndex - 1) % (num+1)
+            if (index1 < 0) {
+              index1 = 4
+            }
+            //alert(num);
+            if (num == 0) {
+                return;
+            } else {
+                audio.src = select.options[index1].value;
+            }
+            //alert("b"+index1);
+            $("#audio option:eq("+ index1 + ")").prop("selected",true);
+              audio.play();
+              //name.innerHTML = select.options[(select.selectedIndex - 1) % 5].value + '재생중'
+          }
+      }
+      $("#prev").click(function() {
+          //$('#audio option:selected').next().attr('selected', 'selected');
+      });
+  
+      function prevPlay() {
+          num = (num - 1) % (num+1)     // 곡이 끝나고 num의 값을 감소 시킨 후 해당 배열의 값으로 src를 변경시킨다. (이전 곡 연주를 위해서)
+          if (num < 0) {      //일단 추가해야 할 것 같아서 -Sam
+            num = 4
+            }
+          audio.src = src[num];
+      }
+  
+  </script>
+  
+    <script>
+
+
+      (function () {
+    var Message;
+    var ws = new WebSocket("ws://52.52.135.8:8000/ws");
+
+    Message = function (arg) {
+        this.text = arg.text, this.message_side = arg.message_side;
+        this.draw = function (_this) {
+            return function () {
+                var $message;
+                $message = $($('.message_template').clone().html());
+                $message.addClass(_this.message_side).find('.text').html(_this.text);
+                $('.messages').append($message);
+                $('.messages').scrollTop($('.messages')[0].scrollHeight);
+                return setTimeout(function () {
+                    return $message.addClass('appeared');
+                }, 0);
+            };
+        }(this);
+        return this;
+    };
+
+    myFunction = function (songNum,sonfName) {
+          //alert("이제, 선택하신 '"+sonfName+"' 곡을 보내 \n추천 AI 가 분석하겠습니다.\n'확인' 누르시고 잠시 기다려주세요.");
+          userselectedtitle = sonfName
+          setTimeout(function () {
+                ws.send('==>'+songNum);
+          }, 2000);
+      };
+
+    $(function () {
+        var getMessageText, sendMessage;
+        message_side = 'right';
+        getMessageText = function () {
+            var $message_input;
+            $message_input = $('.message_input');
+            return $message_input.val();
+        };
+         
+        ws.onmessage = function (event) {
+            var $messages, message;
+            //var aa = "{"+event.data+"}"
+            
+            // Store a JSON value in local storage
+            //localStorage.setItem('person', event.data);
+
+            // parse the value when accessing it
+            //const result_Json = JSON.parse(localStorage.getItem('person'));
+            if (event.data.trim() === '') {
+                return;
+            }
+
+            try {
+                const myObj = JSON.parse(event.data);
+                //var obj = jQuery.parseJSON( '{ "name": "John" }' );
+                var step, myObj_key3, s3path, buttonList, textTosend;
+                var arr = [];
+
+                if (myObj.key1 != "BestForYou") {
+                    sendMessageLeft(myObj.key1 + "<br/>");
+                    textTosend = myObj.key2 + "<br/>";
+                    sendMessageLeft(textTosend);
+                    select.options.length = 0;
+                } else {
+                  $(select).append("<option value='--------------------------'>--------------------------</option>");
+                  src.push("---------------------------------");
+                }
+                //alert(textTosend);
+
+
+                //alert(arr[0]+' '+arr[1]);
+
+                //let selectEl = document.querySelector("select");
+                //value='https://ssacteam2.s3.us-west-1.amazonaws.com/etc/Stars_in_the_Night_Sky_(2020).mp3'
+                //alert(myObj.key4);
+                
+                buttonList = '위 &nbsp;음악들을 감상하시고, 가장 좋았던 한 곡을 아래에서 선택해 주세요.<br/><br/>';
+                
+                for (step =0; step <5; step++) {
+                    myObj_key3 = ''+ myObj.key3.slice(step,step+1);
+                    //alert(myObj_key3.substr(1,myObj_key3.length-2));
+                    if ( myObj_key3.substr(0,1) == "'" ) {
+                      myObj_key3 = myObj_key3.substr(1,myObj_key3.length-6);
+                    } else if ( myObj_key3.substr(0,1) == '"' ) {
+                      myObj_key3 = myObj_key3.substr(1,myObj_key3.length-6);
+                    } else {
+                      myObj_key3 = myObj_key3.substr(0,myObj_key3.length-4);
+                      //alert(myObj_key3);
+                    }
+                    s3path = "<option value=\"https://ssacteam2.s3.us-west-1.amazonaws.com/"+ myObj.key4 + "/" + myObj_key3 +".mp3\">";
+                      //alert(s3path);
+                      $(select).append(s3path + myObj_key3  + "</option>");
+                      src.push(myObj_key3); //select box를 위한 array 생성
+                      if (myObj.key1 != "BestForYou") {
+                          arr[step] = myObj.key5.slice(step,step+1);
+                          //alert(arr[step]);
+                          //buttonList += "<button onclick='myFunction("+ arr[step] +")'>선택곡"+(step+1)+"</button>&ensp;";
+                          buttonList += "&nbsp;&#187;&emsp;<button onclick=\"myFunction("+ arr[step]+',\''+myObj_key3.replace("'",'')+"')\">"+myObj_key3+"</button><br/>";
+                          //alert(buttonList);
+                      }
+                }
+                num = 4; // next/prev 버튼을 위한 구분자 초기값은 0
+
+                if (myObj.key1 != "BestForYou") {                
+                    textTosend = buttonList;
+                    num = 4;
+                    now_and ="지금";
+                    message_side = 'left';
+                } else {
+                  textTosend = now_and+", 선택하신 "+userselectedtitle+" 과 가장 유사한 음악 5곡을 추천해 드렸습니다.<br/>함께 감상하시죠."
+                  num += 6;
+                  now_and ="또";
+                  message_side = 'left2';
+                }
+                //var selectEl = document.querySelector(".audio");
+                //var objOption = document.createElement("option");
+                //objOption.text = myObj.key3.slice(0,1);
+                //objOption.value = myObj.key3.slice(0,1);
+                //selectEl.options[objOption].innerHTML;
+
+                //textTosend += myObj.key3.slice(0,1) + "<br/>";
+                //textTosend += myObj.key3.slice(1,2) + "<br/>" + myObj.key3.slice(2,3) + "<br/>";
+                //textTosend += myObj.key3.slice(3,4) + "<br/>" + myObj.key3.slice(4,5);
+                //console.log('Message from server ', event.data);
+             } catch (err) {
+            //console.log('Error: ', err.message);
+            var textTosend = event.data;
+            message_side = 'left'
+            }
+
+
+            $('.message_input').val('');
+            $messages = $('.messages');
+            //alert(message_side);
+
+            //message_side = message_side === 'left' ? 'left' : 'left';
+            message = new Message({
+                text: textTosend,
+                message_side: message_side
+            });
+            message.draw();
+            return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+        };
+
+        sendMessageLeft = function (text) {
+            var $messages, message;
+            if (text.trim() === '') {
+                return;
+            }
+            $('.message_input').val('');
+            $messages = $('.messages');
+            //message_side = message_side === 'left' ? 'right' : 'left';
+            message_side = message_side === 'left' ? 'left' : 'left';
+            message = new Message({
+                text: text,
+                message_side: message_side
+            });
+            message.draw();
+            return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+        };
+
+        sendMessage = function (text) {
+            var $messages, message;
+            if (text.trim() === '') {
+                return;
+            }
+            $('.message_input').val('');
+            $messages = $('.messages');
+            //message_side = message_side === 'left' ? 'right' : 'left';
+            message_side = message_side === 'left' ? 'right' : 'right';
+            message = new Message({
+                text: text,
+                message_side: message_side
+            });
+            message.draw();
+            return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+        };       
+
+        $('.send_message').click(function (e) {
+                ws.send(getMessageText())
+            return sendMessage(getMessageText());
+        });
+        $('.message_input').keyup(function (e) {
+            //alert(e.which);
+            try {
+              if (e.which === 13) {
+                  ws.send(getMessageText())
+                  return sendMessage(getMessageText());
+              }
+            } catch (err) {
+              console.log('Error: ', err.message);
+            }
+        });
+        sendMessage('');
+      
+
+    });
+
+}.call(this));
+    </script>
+  
+</body>
+</html>
+
